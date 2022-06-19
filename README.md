@@ -1,6 +1,6 @@
 # tmp
 tmp
 
-remothink
+LOCALY
 
 zhu
