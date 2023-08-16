@@ -1,0 +1,27 @@
+name: Check forbidden words
+
+on:
+  pull_request:
+    paths:
+      - 'gef.py'
+
+jobs:
+  check-words:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Fetch Base Ref
+        run: git fetch --depth=1 origin ${{ github.base_ref }}
+
+      - name: Check forbidden words
+        run: |
+          WORDS=("hola" "adios")
+          for word in "${WORDS[@]}"; do
+            if git diff ${{ github.base_ref }}..${{ github.sha }} -- "gef.py" | grep "^+" | grep -q "$word"; then
+              echo "'$word' found in gef.py. Please consider remove it."
+              exit 1
+            fi
+          done
