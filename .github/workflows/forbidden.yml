@@ -1,4 +1,4 @@
-name: Check for words 'hola' and 'adios'
+name: Check forbidden
 
 on:
   pull_request:
@@ -13,13 +13,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 0 # We need the full history to be able to diff
+          fetch-depth: 0
 
-      - name: Check for 'hola' and 'adios' in gef.py
+      - name: Check forbidden words
         run: |
           WORDS=("hola" "adios")
           for word in "${WORDS[@]}"; do
             if git diff ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- "gef.py" | grep "^+" | grep -q "$word"; then
-              echo "::warning '$word' found in gef.py. Consider removing it."
+              echo "::warning:: '$word' found in gef.py. Consider removing it."
             fi
           done
