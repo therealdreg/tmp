@@ -1,4 +1,4 @@
-name: Check forbidden words
+name: Check for words 'hola' and 'adios'
 
 on:
   pull_request:
@@ -6,22 +6,20 @@ on:
       - 'gef.py'
 
 jobs:
-  check-forbidden-words:
+  check-words:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
-      - name: Fetch Base Ref
-        run: git fetch --depth=1 origin ${{ github.base_ref }}
+        with:
+          fetch-depth: 0 # We need the full history to be able to diff
 
       - name: Check for 'hola' and 'adios' in gef.py
         run: |
           WORDS=("hola" "adios")
           for word in "${WORDS[@]}"; do
-            if git diff ${{ github.base_ref }}..${{ github.sha }} -- "gef.py" | grep "^+" | grep -q "$word"; then
+            if git diff ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} -- "gef.py" | grep "^+" | grep -q "$word"; then
               echo "'$word' found in gef.py. Consider removing it."
-              # continue instead of exit to allow the check to complete
             fi
           done
